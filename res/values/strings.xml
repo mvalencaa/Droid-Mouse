@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2009 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Droid Mouse</string>
+
+    <!--  BluetoothChat -->
+    <string name="send">Send</string>
+    <string name="not_connected">Você não está conectado a um dispositivo</string>
+    <string name="bt_not_enabled_leaving">Bluetooth não ativo. Saindo do Bluetooth Chat.</string>
+    <string name="title_connecting">conectando...</string>
+    <string name="title_connected_to">conectado a <xliff:g id="device_name">%1$s</xliff:g></string>
+    <string name="title_not_connected">não conectado</string>
+
+    <!--  DeviceListActivity -->
+    <string name="scanning">Procurando dispositivos...</string>
+    <string name="select_device">Selecione um dispositivo para conectar</string>
+    <string name="none_paired">Nenhum dispositivo pareado</string>
+    <string name="none_found">Nenhum dispositivo encontrado</string>
+    <string name="title_paired_devices">Dispositivos pareados</string>
+    <string name="title_other_devices">Outros Dispositivos Disponíveis</string>
+    <string name="button_scan">Procurar dispositivos</string>
+
+    <!-- Options Menu -->
+    <string name="secure_connect">Conectar um dispositivo</string>
+    <string name="insecure_connect">Connect a device - Insecure</string>
+    <string name="discoverable">Tornar visível</string>
+    
+    <!-- Nossa Main -->
+    <string name="texto">Posição X: 0, Posição Y: 0</string>
+</resources>

@@ -17,10 +17,9 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Droid Mouse</string>
 
-    <!--  BluetoothChat -->
-    <string name="send">Send</string>
+    <!--  BluetoothService -->
     <string name="not_connected">Você não está conectado a um dispositivo</string>
-    <string name="bt_not_enabled_leaving">Bluetooth não ativo. Saindo do Bluetooth Chat.</string>
+    <string name="bt_not_enabled_leaving">Bluetooth não ativo. Saindo do Droid Mouse.</string>
     <string name="title_connecting">conectando...</string>
     <string name="title_connected_to">conectado a <xliff:g id="device_name">%1$s</xliff:g></string>
     <string name="title_not_connected">não conectado</string>
@@ -36,7 +35,6 @@
 
     <!-- Options Menu -->
     <string name="secure_connect">Conectar um dispositivo</string>
-    <string name="insecure_connect">Connect a device - Insecure</string>
     <string name="discoverable">Tornar visível</string>
     
     <!-- Nossa Main -->

@@ -1,4 +1,4 @@
-package br.unb.unbiquitous.ubiquitos.me.uos;
+package br.unb.unbiquitous.ubiquitos.uos.exception;
 
 public class UosException extends Exception {
 

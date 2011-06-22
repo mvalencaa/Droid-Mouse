@@ -2,7 +2,6 @@ package br.unb.unbiquitous.ubiquitos.uos.network.bluetooth;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import bluetooth.BtUtil;
 import br.unb.unbiquitous.ubiquitos.network.model.NetworkDevice;
 
 /**
@@ -13,13 +12,9 @@ import br.unb.unbiquitous.ubiquitos.network.model.NetworkDevice;
  * @author Marcelo Valença
  * 
  */
-public class BluetoothDevice2 extends NetworkDevice {
+public class BluetoothDeviceWrapper extends NetworkDevice {
 
 	private static final String NETWORK_DEVICE_TYPE = "Bluetooth";
-
-	/* *****************************
-	 * ATRUBUTES ****************************
-	 */
 
 	// The bluetooth local device
 	protected BluetoothAdapter localDevice;
@@ -33,16 +28,12 @@ public class BluetoothDevice2 extends NetworkDevice {
 	// the serviceUUID
 	protected String serviceUUID;
 
-	/* *****************************
-	 * CONSTRUCTOR ****************************
-	 */
-
 	/**
 	 * Constructor
 	 * 
 	 * @param remoteDevice
 	 */
-	public BluetoothDevice2(BluetoothAdapter localDevice, String serviceUUID) {
+	public BluetoothDeviceWrapper(BluetoothAdapter localDevice, String serviceUUID) {
 		this.localDevice = localDevice;
 		this.serviceUUID = serviceUUID;
 		// Load the generic name of the device
@@ -55,18 +46,14 @@ public class BluetoothDevice2 extends NetworkDevice {
 	 * @param remoteDevice
 	 * @param btUtil
 	 */
-	public BluetoothDevice2(BluetoothDevice remoteDevice) {
+	public BluetoothDeviceWrapper(BluetoothDevice remoteDevice) {
 		this.remoteDevice = remoteDevice;
 		this.deviceName = remoteDevice.getAddress();
 	}
 
-	public BluetoothDevice2(String networkDeviceName) {
+	public BluetoothDeviceWrapper(String networkDeviceName) {
 		this.deviceName = networkDeviceName;
 	}
-
-	/* *****************************
-	 * PUBLIC METHODS 
-	 * *****************************/
 
 	public String getNetworkDeviceName() {
 		return deviceName;

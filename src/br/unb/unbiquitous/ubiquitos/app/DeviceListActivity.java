@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.BluetoothChat;
+package br.unb.unbiquitous.ubiquitos.app;
 
 import java.util.Set;
 
@@ -36,6 +36,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
+import br.unb.unbiquitous.ubiquitos.app.R;
 
 /**
  * This Activity appears as a dialog. It lists any paired devices and

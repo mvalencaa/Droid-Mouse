@@ -1,22 +1,24 @@
 package br.unb.unbiquitous.ubiquitos.driver;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
+import android.util.Log;
 import br.unb.unbiquitous.ubiquitos.json.JSONException;
 import br.unb.unbiquitous.ubiquitos.json.dataType.JSONDevice;
 import br.unb.unbiquitous.ubiquitos.network.model.NetworkDevice;
-import br.unb.unbiquitous.ubiquitos.uos.adaptability.UosDriver;
+import br.unb.unbiquitous.ubiquitos.uos.UosDeviceManager;
+import br.unb.unbiquitous.ubiquitos.uos.adaptability.DeviceDriver;
 import br.unb.unbiquitous.ubiquitos.uos.context.UOSMessageContext;
-import br.unb.unbiquitous.ubiquitos.uos.driver.DeviceDriver;
 import br.unb.unbiquitous.ubiquitos.uos.messageEngine.dataType.UpDevice;
 import br.unb.unbiquitous.ubiquitos.uos.messageEngine.dataType.UpDriver;
-import br.unb.unbiquitous.ubiquitos.uos.messageEngine.dataType.UpNetworkInterface;
 import br.unb.unbiquitous.ubiquitos.uos.messageEngine.dataType.UpService;
 import br.unb.unbiquitous.ubiquitos.uos.messageEngine.messages.ServiceCall;
 import br.unb.unbiquitous.ubiquitos.uos.messageEngine.messages.ServiceResponse;
 
-public class DeviceDriverImpl implements UosDriver {
+public class DeviceDriverImpl implements DeviceDriver {
+
+	private static final String TAG = "DroidMouse - [DeviceDriverImpl]";
 
 	private static final String DEVICE_KEY = "device";
 
@@ -28,21 +30,23 @@ public class DeviceDriverImpl implements UosDriver {
 
 	private static final String SERVICE_NAME_KEY = "serviceName";
 
-	private String name = "";
+	private UosDeviceManager deviceManager;
 
-	private String address = "";
-
-	// private static Logger logger = Logger.getLogger(DeviceDriver.class);
-
+	private String instanceId;
+	
 	/**
 	 * @see DeviceDriver#listDrivers(ServiceCall, ServiceResponse,
 	 *      UOSMessageContext)
 	 */
-	@SuppressWarnings("unchecked")
 	public void listDrivers(ServiceCall serviceCall,
 			ServiceResponse serviceResponse) {
-		// logger.info("Handling DeviceDriverImpl#listDrivers service");
-
+		Log.d(TAG, "Handling listDrivers service");
+	}
+	
+	@Override
+	public void authenticate(ServiceCall serviceCall,
+			ServiceResponse serviceResponse) {
+		// TODO Auto-generated method stub
 	}
 
 	/**
@@ -51,6 +55,7 @@ public class DeviceDriverImpl implements UosDriver {
 	 */
 	public void handshake(ServiceCall serviceCall,
 			ServiceResponse serviceResponse) {
+		Log.d(TAG, "Handling handshake service");
 
 		// Get and Convert the UpDevice Parameter
 		String deviceParameter = serviceCall.getParameters().get(DEVICE_KEY);
@@ -67,14 +72,11 @@ public class DeviceDriverImpl implements UosDriver {
 		// that is in the parameter
 
 		try {
-			UpDevice upDevice = new UpDevice(name);
-			List<UpNetworkInterface> interfaces = new ArrayList<UpNetworkInterface>();
-			interfaces.add(new UpNetworkInterface("Bluetooth", address));
-			upDevice.setNetworks(interfaces);
-			serviceResponse.addParameter(DEVICE_KEY, new JSONDevice(upDevice)
-					.toString());
+			Map<String, String> response = new HashMap<String, String>();
+			response.put(DEVICE_KEY, new JSONDevice(deviceManager.getCurrentDevice()).toString());
+			serviceResponse.setResponseData(response);
 		} catch (JSONException e) {
-			// logger.error(e);
+			Log.e(TAG, e.getMessage());
 		}
 	}
 
@@ -105,9 +107,9 @@ public class DeviceDriverImpl implements UosDriver {
 		return driver;
 	}
 
-	public void init(String name, String address) {
-		this.name = name;
-		this.address = address;
+	public void init(UosDeviceManager deviceManager, String instanceId) {
+		this.deviceManager = deviceManager;
+		this.instanceId = instanceId;
 	}
 
 	@Override
@@ -122,8 +124,6 @@ public class DeviceDriverImpl implements UosDriver {
 
 	@Override
 	public void tearDown() {
-		// TODO Auto-generated method stub
-
 	}
 
 }

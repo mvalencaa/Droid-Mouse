@@ -33,6 +33,9 @@ import br.unb.unbiquitous.ubiquitos.app.MainActivity;
  * connections with other devices. It has a thread that listens for incoming
  * connections, a thread for connecting with a device, and a thread for
  * performing data transmissions when connected.
+ * 
+ * @author Bruno Pessanha
+ * @author Marcelo Valença
  */
 public class BluetoothService {
 
@@ -46,7 +49,7 @@ public class BluetoothService {
 
 	// Unique UUID for this application
 	static final UUID MY_UUID_SECURE = UUID
-			.fromString("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAB");
+			.fromString("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAC");
 	static final UUID MY_UUID_INSECURE = UUID
 			.fromString("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAB");
 
@@ -66,7 +69,6 @@ public class BluetoothService {
 	public static final int STATE_CONNECTING = 2; // now initiating an outgoing
 	// connection
 	public static final int STATE_CONNECTED = 3; // now connected to a remote
-
 	// device
 
 	/**

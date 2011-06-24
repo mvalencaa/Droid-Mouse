@@ -22,21 +22,26 @@ import br.unb.unbiquitous.ubiquitos.json.JSONException;
 import br.unb.unbiquitous.ubiquitos.json.JSONObject;
 import br.unb.unbiquitous.ubiquitos.json.messages.JSONServiceCall;
 import br.unb.unbiquitous.ubiquitos.json.messages.JSONServiceResponse;
+import br.unb.unbiquitous.ubiquitos.uos.UosDeviceManager;
 import br.unb.unbiquitous.ubiquitos.uos.adaptability.UosDriver;
+import br.unb.unbiquitous.ubiquitos.uos.exception.UosException;
 import br.unb.unbiquitous.ubiquitos.uos.messageEngine.messages.ServiceCall;
 import br.unb.unbiquitous.ubiquitos.uos.messageEngine.messages.ServiceResponse;
 import br.unb.unbiquitous.ubiquitos.uos.network.bluetooth.BluetoothDeviceWrapper;
 
 /**
  * This is the main activity that displays the current mouse application.
+ * 
+ * @author Bruno Pessanha
+ * @author Marcelo Valença
  */
 public class MainActivity extends Activity {
 
 	// Debugging
-	private static final String TAG = "\n\nBluetoothChat\n\n";
-	private static final boolean D = true;
+	private static final String TAG = "\n\nDroid Mouse\n\n";
+	private static final boolean DEBUG = true;
 
-	// Message types sent from the BluetoothChatService Handler
+	// Message types sent from the BluetoothService Handler
 	public static final int MESSAGE_STATE_CHANGE = 1;
 	public static final int MESSAGE_READ = 2;
 	public static final int MESSAGE_WRITE = 3;
@@ -45,7 +50,7 @@ public class MainActivity extends Activity {
 
 	public static final String MESSAGE_SEPARATOR = "\n";
 
-	// Key names received from the BluetoothChatService Handler
+	// Key names received from the BluetoothService Handler
 	public static final String DEVICE_NAME = "device_name";
 	public static final String TOAST = "toast";
 
@@ -55,17 +60,18 @@ public class MainActivity extends Activity {
 
 	// Name of the connected device
 	private String mConnectedDeviceName = null;
-	// String buffer for outgoing messages
-	// private StringBuffer mOutStringBuffer;
+
 	// Local Bluetooth adapter
 	private BluetoothAdapter mAdapter = null;
+
 	// Member object for the chat services
 	private BluetoothService mService = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (D)
+
+		if (DEBUG)
 			Log.e(TAG, "+++ ON CREATE +++");
 
 		// Set up the window layout
@@ -100,10 +106,11 @@ public class MainActivity extends Activity {
 	@Override
 	public void onStart() {
 		super.onStart();
-		if (D)
+
+		if (DEBUG)
 			Log.e(TAG, "++ ON START ++");
 
-		// If BT is not on, request that it be enabled.
+		// If Bluetooth is not on, request that it be enabled.
 		// setupChat() will then be called during onActivityResult
 		if (!mAdapter.isEnabled()) {
 			Intent enableIntent = new Intent(
@@ -119,18 +126,20 @@ public class MainActivity extends Activity {
 	@Override
 	public synchronized void onResume() {
 		super.onResume();
-		if (D)
+
+		if (DEBUG)
 			Log.e(TAG, "+ ON RESUME +");
 
-		// Performing this check in onResume() covers the case in which BT was
-		// not enabled during onStart(), so we were paused to enable it...
+		// Performing this check in onResume() covers the case in which
+		// Bluetooth was not enabled during onStart(), so we were paused
+		// to enable it...
 		// onResume() will be called when ACTION_REQUEST_ENABLE activity
 		// returns.
 		if (mService != null) {
 			// Only if the state is STATE_NONE, do we know that we haven't
 			// started already
 			if (mService.getState() == BluetoothService.STATE_NONE) {
-				// Start the Bluetooth chat services
+				// Start the Bluetooth service
 				mService.start();
 			}
 		}
@@ -146,30 +155,35 @@ public class MainActivity extends Activity {
 	@Override
 	public synchronized void onPause() {
 		super.onPause();
-		if (D)
+
+		if (DEBUG)
 			Log.e(TAG, "- ON PAUSE -");
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
-		if (D)
+
+		if (DEBUG)
 			Log.e(TAG, "-- ON STOP --");
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		// Stop the Bluetooth chat services
+
+		// Stop the Bluetooth service
 		if (mService != null)
 			mService.stop();
-		if (D)
+
+		if (DEBUG)
 			Log.e(TAG, "--- ON DESTROY ---");
 	}
 
 	private void ensureDiscoverable() {
-		if (D)
+		if (DEBUG)
 			Log.d(TAG, "ensure discoverable");
+
 		if (mAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
 			Intent discoverableIntent = new Intent(
 					BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
@@ -205,10 +219,9 @@ public class MainActivity extends Activity {
 	private final Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-
 			switch (msg.what) {
 			case MESSAGE_STATE_CHANGE:
-				if (D)
+				if (DEBUG)
 					Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
 				break;
 			case MESSAGE_WRITE:
@@ -237,23 +250,26 @@ public class MainActivity extends Activity {
 					// TODO Testar tipo da mensagem!
 
 					UosDriver deviceDriver = new DeviceDriverImpl();
-					deviceDriver
-							.init(mAdapter.getName(), mAdapter.getAddress());
+					UosDeviceManager deviceManager = new UosDeviceManager(
+							mAdapter.getName(), mAdapter.getAddress().replace(
+									":", "").trim());
+					deviceManager.addDriver(new DeviceDriverImpl(),
+							"defaultDeviceDriver");
 
 					JSONServiceCall jsonUtil = new JSONServiceCall(readMessage);
 					ServiceCall serviceCall = jsonUtil.getAsObject();
-					ServiceResponse serviceResponse = new ServiceResponse();
-
-					deviceDriver.handleServiceCall(serviceCall,
-							serviceResponse, clientDevice);
+					ServiceResponse serviceResponse = deviceManager.getAdaptabilityEngine().handleServiceCall(
+							serviceCall, clientDevice);
 
 					JSONServiceResponse jsonResponse = new JSONServiceResponse(
 							serviceResponse);
 
-					MainActivity.this.sendMessage(jsonResponse.toString());
+					MainActivity.this.sendMessage(jsonResponse.toString()
+							+ MESSAGE_SEPARATOR);
 				} catch (JSONException e) {
-					// // logger.error("Failed to handle Droid Mouse message.",
-					// e);
+					Log.e(TAG, "Failed to handle Droid Mouse message.", e);
+				} catch (UosException e) {
+					Log.e(TAG, "Failed to add defaultDeviceDriver.", e);
 				}
 
 				break;
@@ -274,7 +290,7 @@ public class MainActivity extends Activity {
 	};
 
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (D)
+		if (DEBUG)
 			Log.d(TAG, "onActivityResult " + resultCode);
 		switch (requestCode) {
 		case REQUEST_CONNECT_DEVICE_SECURE:

@@ -12,10 +12,9 @@ import br.unb.unbiquitous.ubiquitos.app.MainActivity;
 /**
  * This thread runs during a connection with a remote device.
  * It handles all incoming and outgoing transmissions.
- */
-/**
- * This thread runs during a connection with a remote device. It handles all
- * incoming and outgoing transmissions.
+ * 
+ * @author Bruno Pessanha
+ * @author Marcelo Valença
  */
 public class ConnectedThread extends Thread {
 

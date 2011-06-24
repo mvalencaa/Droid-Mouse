@@ -10,6 +10,9 @@ import android.util.Log;
  * This thread runs while attempting to make an outgoing connection
  * with a device. It runs straight through; the connection either
  * succeeds or fails.
+ * 
+ * @author Bruno Pessanha
+ * @author Marcelo Valença
  */
 public class ConnectThread extends Thread {
 	

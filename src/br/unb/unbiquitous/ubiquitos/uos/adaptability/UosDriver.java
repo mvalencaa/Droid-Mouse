@@ -1,6 +1,7 @@
 package br.unb.unbiquitous.ubiquitos.uos.adaptability;
 
 import br.unb.unbiquitous.ubiquitos.network.model.NetworkDevice;
+import br.unb.unbiquitous.ubiquitos.uos.UosDeviceManager;
 import br.unb.unbiquitous.ubiquitos.uos.messageEngine.dataType.UpDriver;
 import br.unb.unbiquitous.ubiquitos.uos.messageEngine.messages.ServiceCall;
 import br.unb.unbiquitous.ubiquitos.uos.messageEngine.messages.ServiceResponse;
@@ -27,7 +28,7 @@ public interface UosDriver {
 	/**
 	 * Method responsible for executing initialization tasks for the Driver
 	 */
-	public void init(String name, String address);
+	public void init(UosDeviceManager deviceManager, String instanceId);
 	
 	/**
 	 * Method responsible for executing clean-up tasks for the Driver

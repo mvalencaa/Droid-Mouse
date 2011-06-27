@@ -1,14 +1,21 @@
 package br.unb.unbiquitous.ubiquitos.driver;
 
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
+import java.util.Vector;
 
 import android.util.Log;
 import br.unb.unbiquitous.ubiquitos.json.JSONException;
+import br.unb.unbiquitous.ubiquitos.json.JSONObject;
 import br.unb.unbiquitous.ubiquitos.json.dataType.JSONDevice;
+import br.unb.unbiquitous.ubiquitos.json.dataType.JSONDriver;
 import br.unb.unbiquitous.ubiquitos.network.model.NetworkDevice;
 import br.unb.unbiquitous.ubiquitos.uos.UosDeviceManager;
+import br.unb.unbiquitous.ubiquitos.uos.adaptability.AdaptabilityEngine;
 import br.unb.unbiquitous.ubiquitos.uos.adaptability.DeviceDriver;
+import br.unb.unbiquitous.ubiquitos.uos.adaptability.UosDriver;
 import br.unb.unbiquitous.ubiquitos.uos.context.UOSMessageContext;
 import br.unb.unbiquitous.ubiquitos.uos.messageEngine.dataType.UpDevice;
 import br.unb.unbiquitous.ubiquitos.uos.messageEngine.dataType.UpDriver;
@@ -31,7 +38,7 @@ public class DeviceDriverImpl implements DeviceDriver {
 	private static final String SERVICE_NAME_KEY = "serviceName";
 
 	private UosDeviceManager deviceManager;
-
+	
 	private String instanceId;
 	
 	/**
@@ -41,6 +48,59 @@ public class DeviceDriverImpl implements DeviceDriver {
 	public void listDrivers(ServiceCall serviceCall,
 			ServiceResponse serviceResponse) {
 		Log.d(TAG, "Handling listDrivers service");
+		
+//		logger.info("Handling DeviceDriverImpl#listDrivers service");
+
+        Hashtable listDrivers = deviceManager.getAdaptabilityEngine().getDriversMap();
+        
+        Hashtable<String, String> parameters =  new Hashtable<String, String>(serviceCall.getParameters());
+        
+        //handle parameters to filter message
+        String serviceParam = null;
+        String driverParam = null;
+        if (parameters != null){
+                serviceParam = (String) parameters.get(SERVICE_NAME_KEY);
+                driverParam = (String) parameters.get(DRIVER_NAME_KEY);
+        }
+        
+        // Converts the list of DriverData into Parameters
+        // <String, String>
+        Hashtable driversList = new Hashtable();
+        
+        if (listDrivers != null && !listDrivers.isEmpty()){
+                Enumeration instanceIds = listDrivers.keys();
+                while (instanceIds.hasMoreElements()) {
+                        String instanceId = (String)instanceIds.nextElement();
+                        //Filter by Parameters
+                        try {
+                                UpDriver driver = ((UosDriver)listDrivers.get(instanceId)).getDriver();
+                                // filter by driver name
+                                if (driverParam == null || driverParam.equalsIgnoreCase(driver.getName())){
+                                        boolean include = true;
+                                        if (serviceParam != null){
+                                                include = false;
+                                                Vector driverServices = new Vector(driver.getServices());
+                                                if (driverServices != null && !driverServices.isEmpty()){
+                                                        for (int i = 0; i < driverServices.size(); i++ ){
+                                                                UpService uService = (UpService)driverServices.elementAt(i);
+                                                                if (uService.getName().equalsIgnoreCase(serviceParam)){
+                                                                        include = true;
+                                                                        break;
+                                                                }
+                                                        }
+                                                }
+                                        }
+                                        if (include){
+                                                JSONDriver jsonDriver = new JSONDriver(driver);
+                                                driversList.put(instanceId, jsonDriver.toString());
+                                        }
+                                }
+                        } catch (JSONException e) {
+//                                logger.error("Cannot handle Driver with IntanceId : "+instanceId,e);
+                        }
+                }
+        }
+        serviceResponse.addParameter(DRIVER_LIST_KEY, new JSONObject(driversList).toString());
 	}
 	
 	@Override

@@ -17,6 +17,7 @@ import android.view.View.OnTouchListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import br.unb.unbiquitous.ubiquitos.app.bluetooth.BluetoothService;
+import br.unb.unbiquitous.ubiquitos.app.mouse.MouseDriver;
 import br.unb.unbiquitous.ubiquitos.driver.DeviceDriverImpl;
 import br.unb.unbiquitous.ubiquitos.json.JSONException;
 import br.unb.unbiquitous.ubiquitos.json.JSONObject;
@@ -66,11 +67,13 @@ public class MainActivity extends Activity {
 
 	// Member object for the chat services
 	private BluetoothService mService = null;
+	
+	private UosDeviceManager mDeviceManager = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		if (DEBUG)
 			Log.e(TAG, "+++ ON CREATE +++");
 
@@ -82,8 +85,27 @@ public class MainActivity extends Activity {
 
 		// If the adapter is null, then Bluetooth is not supported
 		if (mAdapter == null) {
-			Toast.makeText(this, "Bluetooth is not available",
+			Toast.makeText(this, "Bluetooth indisponível.",
 					Toast.LENGTH_LONG).show();
+			finish();
+			return;
+		}
+		
+		mDeviceManager = new UosDeviceManager(
+				mAdapter.getName(), mAdapter.getAddress().replace(
+						":", "").trim());
+		
+		try {
+			mDeviceManager.addDriver(new DeviceDriverImpl(),
+					"defaultDeviceDriver");
+			mDeviceManager.addDriver(new MouseDriver(),
+			"defaultMouseDriver");
+		} catch (UosException e) {
+			Toast.makeText(this, "Um erro inesperado ocorreu. A aplicação será finalizada.",
+					Toast.LENGTH_LONG).show();
+			
+			Log.e(TAG, "Erro ao adicionar driver." + e.getMessage());
+			
 			finish();
 			return;
 		}
@@ -249,16 +271,9 @@ public class MainActivity extends Activity {
 
 					// TODO Testar tipo da mensagem!
 
-					UosDriver deviceDriver = new DeviceDriverImpl();
-					UosDeviceManager deviceManager = new UosDeviceManager(
-							mAdapter.getName(), mAdapter.getAddress().replace(
-									":", "").trim());
-					deviceManager.addDriver(new DeviceDriverImpl(),
-							"defaultDeviceDriver");
-
 					JSONServiceCall jsonUtil = new JSONServiceCall(readMessage);
 					ServiceCall serviceCall = jsonUtil.getAsObject();
-					ServiceResponse serviceResponse = deviceManager.getAdaptabilityEngine().handleServiceCall(
+					ServiceResponse serviceResponse = mDeviceManager.getAdaptabilityEngine().handleServiceCall(
 							serviceCall, clientDevice);
 
 					JSONServiceResponse jsonResponse = new JSONServiceResponse(

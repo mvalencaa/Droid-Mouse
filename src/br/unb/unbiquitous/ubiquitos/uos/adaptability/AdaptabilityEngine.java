@@ -3,6 +3,7 @@ package br.unb.unbiquitous.ubiquitos.uos.adaptability;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import android.util.Log;
 import br.unb.unbiquitous.ubiquitos.network.model.NetworkDevice;
 import br.unb.unbiquitous.ubiquitos.uos.UosDeviceManager;
 import br.unb.unbiquitous.ubiquitos.uos.exception.UosException;
@@ -17,6 +18,9 @@ import br.unb.unbiquitous.ubiquitos.uos.messageEngine.messages.ServiceResponse;
  *
  */
 public class AdaptabilityEngine {
+	
+	private static final String TAG = "DroidMouse - [AdaptabilityEngine]";
+	
     private UosDeviceManager deviceManager;
     
     //<String,Vector>
@@ -75,48 +79,48 @@ public class AdaptabilityEngine {
      */
     public ServiceResponse handleServiceCall(ServiceCall serviceCall, NetworkDevice networkDevice) throws UosException{
             ServiceResponse serviceResponse = new ServiceResponse();
-//            logger.debug("ServiceCall received.");
+            Log.d(TAG, "ServiceCall received.");
             if (serviceCall != null){
                     String instanceId = serviceCall.getInstanceId();
                     if (instanceId != null &&
                                     !instanceId.trim().equals("")){
                             // Call the proper instance
-//                            logger.debug("Searching for a driver with instanceID : "+instanceId);
+                    	Log.d(TAG, "Searching for a driver with instanceID : " + instanceId);
                             UosDriver driver = (UosDriver)instanceDriverMap.get(instanceId);
                             if (driver != null){
-//                                    logger.debug("Delegating service Call to proper driver instance.");
+                            	Log.d(TAG, "Delegating service Call to proper driver instance.");    	
                                     driver.handleServiceCall(serviceCall, serviceResponse, networkDevice);
                             }else{
                                     String message = "No Instance Driver was found with the instanceID :"+instanceId;
                                     serviceResponse.setError(message);
-//                                    logger.info(message);
+                                	Log.i(TAG, message);
                             }
                     } else {
                             String driverName = serviceCall.getDriver();
                             if (driverName != null &&
                                             !driverName.trim().equals("")){
                                     // Choose a proper driver to call
-//                                    logger.debug("Searching for a driver instance fro driver : "+driverName);
+                            	Log.d(TAG, "Searching for a driver instance fro driver : " + driverName);
                                     Vector driverPool = (Vector)driverMap.get(driverName);
                                     if (driverPool != null && !driverPool.isEmpty()){
-//                                            logger.debug("Getting first driver instance available.");
+                                    	Log.d(TAG, "Getting first driver instance available.");
                                             UosDriver driver = (UosDriver)driverPool.firstElement();
-//                                            logger.debug("Delegating service Call to proper driver instance chosen.");
+                                            Log.d(TAG, "Delegating service Call to proper driver instance chosen.");
                                             driver.handleServiceCall(serviceCall, serviceResponse, networkDevice);
                                     }else{
                                             String message = "No Instance Driver was found for driver :"+driverName;
                                             serviceResponse.setError(message);
-//                                            logger.info(message);
+                                            Log.i(TAG, message);
                                     }
                             }else{
                                     // Inform error
                                     String message = "Malformed Service Call";
                                     serviceResponse.setError(message);
-//                                    logger.warning(message);
+                                    Log.w(TAG, message);
                             }
                     }
             }else{
-//                    logger.error("No service call received");
+            	Log.e(TAG, "No service call received");
             }
             return serviceResponse;
     }

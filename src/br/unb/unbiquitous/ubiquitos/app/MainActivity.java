@@ -91,25 +91,6 @@ public class MainActivity extends Activity {
 			return;
 		}
 		
-		mDeviceManager = new UosDeviceManager(
-				mAdapter.getName(), mAdapter.getAddress().replace(
-						":", "").trim());
-		
-		try {
-			mDeviceManager.addDriver(new DeviceDriverImpl(),
-					"defaultDeviceDriver");
-			mDeviceManager.addDriver(new MouseDriver(),
-			"defaultMouseDriver");
-		} catch (UosException e) {
-			Toast.makeText(this, "Um erro inesperado ocorreu. A aplicação será finalizada.",
-					Toast.LENGTH_LONG).show();
-			
-			Log.e(TAG, "Erro ao adicionar driver." + e.getMessage());
-			
-			finish();
-			return;
-		}
-
 		// Mostra posições
 		View view = (View) findViewById(R.id.topLayout);
 		view.setOnTouchListener(new OnTouchListener() {
@@ -138,10 +119,28 @@ public class MainActivity extends Activity {
 			Intent enableIntent = new Intent(
 					BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-			// Otherwise, setup the chat session
 		} else {
 			if (mService == null)
 				setupService();
+		}
+		
+		mDeviceManager = new UosDeviceManager(
+				mAdapter.getName(), mAdapter.getAddress().replace(
+						":", "").trim());
+		
+		try {
+			mDeviceManager.addDriver(new DeviceDriverImpl(),
+					"defaultDeviceDriver");
+			mDeviceManager.addDriver(new MouseDriver(),
+			"defaultMouseDriver");
+		} catch (UosException e) {
+			Toast.makeText(this, "Um erro inesperado ocorreu. A aplicação será finalizada.",
+					Toast.LENGTH_LONG).show();
+			
+			Log.e(TAG, "Erro ao adicionar driver." + e.getMessage());
+			
+			finish();
+			return;
 		}
 	}
 
